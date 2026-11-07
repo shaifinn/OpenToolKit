@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OpenKit – free everyday tools</title>
+<meta name="description" content="Free everyday tools that run entirely in your browser. No sign-up, no uploads.">
+<meta property="og:title" content="OpenKit – free everyday tools"><meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f4;--sf:#fff;--ink:#14202b;--mut:#566574;--ln:#d3dae1;--ac:#2b4eff;--st:#d9730d;--er:#b8302a;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#10161d;--sf:#18212b;--ink:#e8edf2;--mut:#9aa9b8;--ln:#2a3644;--ac:#8ea1ff;--st:#f0a04b;--er:#ff8a80;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#10161d;--sf:#18212b;--ink:#e8edf2;--mut:#9aa9b8;--ln:#2a3644;--ac:#8ea1ff;--st:#f0a04b;--er:#ff8a80;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 'Schibsted Grotesk',system-ui,sans-serif}
+.w{max-width:960px;margin:0 auto;padding:0 20px}
+header .w{display:flex;justify-content:space-between;align-items:center;height:60px}
+.logo{font-weight:700;font-size:18px;letter-spacing:-.02em;color:inherit;text-decoration:none}
+h1{font-size:clamp(32px,7vw,56px);line-height:1.05;letter-spacing:-.035em;margin:32px 0 12px;max-width:14em}
+h2{font-size:clamp(26px,5vw,36px);letter-spacing:-.03em;margin:8px 0}
+.lead{color:var(--mut);max-width:34em;margin:0 0 24px}
+input,select,textarea,button{font:inherit;color:inherit}
+input,select,textarea{width:100%;background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:10px 12px}
+textarea{font-family:ui-monospace,Menlo,monospace;font-size:14px}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.search{font-size:18px;padding:14px 16px;border-radius:10px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:16px 0 8px}
+.chip,.btn{flex:none;border:1px solid var(--ln);background:var(--sf);border-radius:99px;padding:6px 14px;cursor:pointer}
+.chip[aria-pressed=true],.btn.p{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.rec{color:var(--mut);font-size:14px;margin:8px 0}.rec a{color:var(--ac);margin-right:12px}
+.list{list-style:none;margin:8px 0 48px;padding:0;display:grid;grid-template-columns:1fr 1fr;column-gap:32px}
+@media(max-width:700px){.list{grid-template-columns:1fr}}
+.list li{display:flex;align-items:center;border-bottom:1px solid var(--ln)}
+.list li.empty{display:block;padding:16px 0;color:var(--mut);grid-column:1/-1}
+.list a{flex:1;min-width:0;padding:12px 0;text-decoration:none;color:inherit}
+.list b{font-weight:500}.list small{display:block;color:var(--mut)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
+.star{background:none;border:0;font-size:20px;cursor:pointer;color:var(--mut);padding:8px}
+.star[aria-pressed=true]{color:var(--st)}
+.back{color:var(--ac);text-decoration:none;display:inline-block;margin-top:12px}
+.fld{margin:14px 0}.fld label{display:block;font-weight:500;margin-bottom:4px}
+.chk{display:flex;gap:8px;align-items:center}.chk input{width:auto}.chk label{margin:0}
+.fld input[type=color]{height:44px;padding:4px}
+.out{background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:14px;white-space:pre-wrap;word-break:break-word;font:14px/1.6 ui-monospace,Menlo,monospace;min-height:56px;overflow-x:auto;margin:16px 0}
+.out.err{color:var(--er)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px}
+.big{font-size:clamp(48px,14vw,88px);font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:-.03em;margin:16px 0}
+.pair{display:flex;gap:8px;max-width:260px}
+footer{border-top:1px solid var(--ln);color:var(--mut);padding:20px 0;font-size:14px}
+</style></head><body>
+<header><div class="w"><a class="logo" href="#">OpenKit</a><button class="btn" id="th" aria-label="Switch light or dark theme">Theme</button></div></header>
+<main class="w" id="app"></main>
+<footer><div class="w">Everything runs on your device. Nothing is uploaded. MIT licensed.</div></footer>
+<script>
+const $=(s,e=document)=>e.querySelector(s);
+const h=(t,a={},...c)=>{const e=document.createElement(t);for(const k in a){if(k=='class')e.className=a[k];else if(k.startsWith('on'))e.addEventListener(k.slice(2),a[k]);else if(a[k]!=null&&a[k]!==false)e.setAttribute(k,a[k])}c.flat().forEach(x=>x!=null&&e.append(x.nodeType?x:document.createTextNode(x)));return e};
+const ls={g(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const fmt=(x,d=6)=>Number.isFinite(x)?x.toLocaleString(undefined,{maximumFractionDigits:d}):'Not a number';
+const N=(x,l)=>{const n=parseFloat(x);if(isNaN(n))throw Error('Enter a number for '+l);return n};
+const rnd=n=>{const m=Math.floor(2**32/n)*n;let x;do{x=crypto.getRandomValues(new Uint32Array(1))[0]}while(x>=m);return x%n};
+const today=new Date().toISOString().slice(0,10),later=new Date(Date.now()+30*864e5).toISOString().slice(0,10);
+const T=[],add=(id,name,cat,desc,f,run,o)=>T.push({id,name,cat,desc,f,run,...o}),F=(k,l,t,d,o)=>({k,l,t,d,o});
+const words=s=>s.match(/[A-Za-z0-9]+/g)||[],cap=x=>x[0].toUpperCase()+x.slice(1).toLowerCase();
+
+// Text
+add('word-counter','Word counter','Text','Count words, characters, sentences and reading time.',[F('t','Text','a','Paste or type your text here. Counts update as you type.')],v=>{const s=v.t,w=(s.match(/\S+/g)||[]).length;return `Words: ${w}\nCharacters: ${s.length}\nCharacters (no spaces): ${s.replace(/\s/g,'').length}\nSentences: ${(s.match(/[^.!?]+[.!?]+/g)||[]).length}\nParagraphs: ${s.split(/\n\s*\n/).filter(x=>x.trim()).length}\nReading time: ${w?Math.max(1,Math.round(w/230)):0} min`});
+const CM={UPPERCASE:s=>s.toUpperCase(),lowercase:s=>s.toLowerCase(),'Title Case':s=>s.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()),'Sentence case':s=>s.toLowerCase().replace(/(^\s*|[.!?]\s+)([a-z])/g,(m,a,b)=>a+b.toUpperCase()),camelCase:s=>words(s).map((x,i)=>i?cap(x):x.toLowerCase()).join(''),snake_case:s=>words(s).map(x=>x.toLowerCase()).join('_'),'kebab-case':s=>words(s).map(x=>x.toLowerCase()).join('-')};
+add('case-converter','Case converter','Text','Switch text between upper, lower, title, camel, snake and kebab case.',[F('t','Text','a','hello open kit world'),F('m','Case','s','Title Case',Object.keys(CM))],v=>CM[v.m](v.t));
+add('duplicate-lines','Duplicate line remover','Text','Keep only the first copy of each line.',[F('t','Lines','a','apple\nbanana\napple\nCherry\ncherry'),F('i','Ignore letter case','c',true)],v=>{const seen=new Set();return v.t.split('\n').filter(l=>{const k=v.i?l.trim().toLowerCase():l;if(seen.has(k))return false;seen.add(k);return true}).join('\n')});
+const LW='lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo consequat'.split(' ');
+add('lorem-ipsum','Lorem ipsum generator','Text','Make placeholder paragraphs for layouts and mockups.',[F('n','Paragraphs','n','3')],v=>{const n=N(v.n,'Paragraphs');if(n<1||n>50)throw Error('Choose 1 to 50 paragraphs');return Array.from({length:n},()=>Array.from({length:4+rnd(3)},()=>{const s=Array.from({length:8+rnd(7)},()=>LW[rnd(LW.length)]).join(' ');return cap(s)[0]+s.slice(1)+'.'}).join(' ')).join('\n\n')});
+
+// Developer
+add('json-formatter','JSON formatter & validator','Developer','Validate JSON and format or minify it.',[F('t','JSON','a','{"name":"OpenKit","tools":[1,2,3]}'),F('i','Format','s','2 spaces',['2 spaces','4 spaces','Minify'])],v=>{let j;try{j=JSON.parse(v.t)}catch(e){throw Error('Invalid JSON: '+e.message)}return JSON.stringify(j,null,v.i=='Minify'?0:v.i[0]*1)});
+add('base64','Base64 encoder & decoder','Developer','Convert text to Base64 and back, with full Unicode support.',[F('t','Text','a','Hello, OpenKit'),F('m','Mode','s','Encode',['Encode','Decode'])],v=>{if(v.m=='Encode'){let b='';new TextEncoder().encode(v.t).forEach(c=>b+=String.fromCharCode(c));return btoa(b)}try{return new TextDecoder().decode(Uint8Array.from(atob(v.t.trim()),c=>c.charCodeAt(0)))}catch{throw Error('That isn’t valid Base64')}});
+add('url-encoder','URL encoder & decoder','Developer','Percent-encode or decode text for use in URLs.',[F('t','Text','a','a b&c=d/é'),F('m','Mode','s','Encode',['Encode','Decode'])],v=>{try{return v.m=='Encode'?encodeURIComponent(v.t):decodeURIComponent(v.t)}catch{throw Error('That text has an invalid percent sequence')}});
+add('uuid','UUID generator','Developer','Generate random version 4 UUIDs.',[F('n','How many','n','5')],v=>{const n=N(v.n,'Count');if(n<1||n>100)throw Error('Choose 1 to 100');if(!crypto.randomUUID)throw Error('This browser can’t generate UUIDs');return Array.from({length:n},()=>crypto.randomUUID()).join('\n')});
+const b64u=p=>new TextDecoder().decode(Uint8Array.from(atob(p.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0)));
+add('jwt-decoder','JWT decoder','Developer','Read the header and payload of a JSON Web Token. The signature is not verified.',[F('t','Token','a','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ik9wZW5LaXQiLCJpYXQiOjE1MTYyMzkwMjJ9.signature')],v=>{const p=v.t.trim().split('.');if(p.length!=3)throw Error('A JWT has three parts separated by dots');try{return 'Header\n'+JSON.stringify(JSON.parse(b64u(p[0])),null,2)+'\n\nPayload\n'+JSON.stringify(JSON.parse(b64u(p[1])),null,2)}catch{throw Error('Couldn’t decode this token')}});
+add('regex-tester','Regex tester','Developer','Test a pattern and list every match with its position.',[F('p','Pattern','t','\\b\\w{5}\\b'),F('g','Flags','t','g'),F('t','Test text','a','Hello there, world of tools.')],v=>{if(!v.p)throw Error('Enter a pattern');const m=[...v.t.matchAll(new RegExp(v.p,v.g.includes('g')?v.g:v.g+'g'))];return m.length?`${m.length} match${m.length>1?'es':''}\n`+m.map(x=>`#${x.index}: ${x[0]}`).join('\n'):'No matches'});
+
+// Calculators
+const PM=['X% of Y','X is what % of Y','Change from X to Y'];
+add('percentage','Percentage calculator','Calculators','Three common percentage questions in one place.',[F('m','Question','s',PM[0],PM),F('a','X','n','15'),F('b','Y','n','200')],v=>{const a=N(v.a,'X'),b=N(v.b,'Y');return v.m==PM[0]?fmt(a/100*b):v.m==PM[1]?fmt(a/b*100)+'%':fmt((b-a)/a*100)+'%'});
+add('bmi','BMI calculator','Calculators','Body mass index from weight and height.',[F('w','Weight (kg)','n','70'),F('h','Height (cm)','n','175')],v=>{const w=N(v.w,'Weight'),c=N(v.h,'Height');if(w<=0||c<=0)throw Error('Use positive values');const b=w/(c/100)**2;return `BMI: ${fmt(b,1)}\n${b<18.5?'Underweight':b<25?'Healthy range':b<30?'Overweight':'Obese'}\nA general guide only, not medical advice.`});
+add('emi','EMI calculator','Calculators','Monthly loan payment, total interest and total cost.',[F('p','Loan amount','n','500000'),F('r','Yearly interest rate (%)','n','8.5'),F('n','Months','n','60')],v=>{const P=N(v.p,'Loan amount'),R=N(v.r,'Rate'),n=N(v.n,'Months');if(P<=0||n<=0||R<0)throw Error('Use positive values');const r=R/1200,e=r?P*r*(1+r)**n/((1+r)**n-1):P/n;return `Monthly EMI: ${fmt(e,2)}\nTotal payment: ${fmt(e*n,2)}\nTotal interest: ${fmt(e*n-P,2)}`});
+add('compound-interest','Compound interest calculator','Calculators','See how savings grow with compounding.',[F('p','Principal','n','10000'),F('r','Yearly rate (%)','n','7'),F('t','Years','n','10'),F('n','Compounds per year','s','12',['1','2','4','12','365'])],v=>{const P=N(v.p,'Principal'),r=N(v.r,'Rate')/100,t=N(v.t,'Years'),n=+v.n,A=P*(1+r/n)**(n*t);return `Final amount: ${fmt(A,2)}\nInterest earned: ${fmt(A-P,2)}`});
+add('age','Age calculator','Calculators','Exact age in years, months and days, plus days to your next birthday.',[F('d','Date of birth','d','2000-01-01')],v=>{if(!v.d)throw Error('Pick a birth date');const b=new Date(v.d+'T00:00'),n=new Date();if(b>n)throw Error('That date is in the future');let y=n.getFullYear()-b.getFullYear(),m=n.getMonth()-b.getMonth(),d=n.getDate()-b.getDate();if(d<0){m--;d+=new Date(n.getFullYear(),n.getMonth(),0).getDate()}if(m<0){y--;m+=12}const t0=new Date(n.getFullYear(),n.getMonth(),n.getDate()),nx=new Date(n.getFullYear(),b.getMonth(),b.getDate());if(nx<=t0)nx.setFullYear(n.getFullYear()+1);return `${y} years, ${m} months, ${d} days\nNext birthday in ${Math.round((nx-t0)/864e5)} days`});
+add('date-difference','Date difference','Calculators','Days, weeks, months and years between two dates.',[F('a','From','d',today),F('b','To','d',later)],v=>{if(!v.a||!v.b)throw Error('Pick both dates');const d=Math.round(Math.abs(new Date(v.b+'T00:00')-new Date(v.a+'T00:00'))/864e5);return `${d} days\n${fmt(d/7,1)} weeks\nAbout ${fmt(d/30.4375,1)} months\nAbout ${fmt(d/365.25,2)} years`});
+add('discount','Discount calculator','Calculators','Final price and savings after a percentage discount.',[F('p','Original price','n','2499'),F('d','Discount (%)','n','20')],v=>{const p=N(v.p,'Price'),d=N(v.d,'Discount');if(d<0||d>100)throw Error('Discount must be between 0 and 100');return `You pay: ${fmt(p*(1-d/100),2)}\nYou save: ${fmt(p*d/100,2)}`});
+
+// Converters
+const U=(id,name,tab)=>{const k=Object.keys(tab);add(id,name+' converter','Converters','Convert between '+k.join(', ')+'.',[F('x','Value','n','1'),F('a','From','s',k[0],k),F('b','To','s',k[1],k)],v=>`${fmt(N(v.x,'Value')*tab[v.a]/tab[v.b])} ${v.b}`)};
+U('length','Length',{m:1,km:1e3,cm:.01,mm:.001,mi:1609.344,yd:.9144,ft:.3048,in:.0254});
+U('weight','Weight',{kg:1,g:.001,mg:1e-6,lb:.45359237,oz:.028349523125,t:1e3});
+U('data-storage','Data storage',{B:1,KB:1024,MB:1024**2,GB:1024**3,TB:1024**4});
+add('temperature','Temperature converter','Converters','Convert between Celsius, Fahrenheit and Kelvin.',[F('x','Value','n','100'),F('a','From','s','°C',['°C','°F','K']),F('b','To','s','°F',['°C','°F','K'])],v=>{const x=N(v.x,'Value'),c=v.a=='°C'?x:v.a=='°F'?(x-32)*5/9:x-273.15;return fmt(v.b=='°C'?c:v.b=='°F'?c*9/5+32:c+273.15)+' '+v.b});
+
+// Security
+add('password-generator','Password generator','Security','Random passwords made with your browser’s secure generator.',[F('n','Length','n','16'),F('u','Uppercase','c',true),F('l','Lowercase','c',true),F('d','Digits','c',true),F('s','Symbols','c',true)],v=>{const n=N(v.n,'Length');if(n<4||n>128)throw Error('Choose a length from 4 to 128');const S=[[v.u,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'],[v.l,'abcdefghijklmnopqrstuvwxyz'],[v.d,'0123456789'],[v.s,'!@#$%^&*()-_=+[]{};:,.?']].filter(x=>x[0]).map(x=>x[1]);if(!S.length)throw Error('Select at least one character type');const pool=S.join('');let p;do{p=Array.from({length:n},()=>pool[rnd(pool.length)]).join('')}while(!S.every(s=>[...s].some(c=>p.includes(c))));return p});
+add('password-strength','Password strength checker','Security','Rough strength estimate. Your password never leaves this page.',[F('p','Password','p','')],v=>{const s=v.p;if(!s)throw Error('Type a password to check');let c=0;if(/[a-z]/.test(s))c+=26;if(/[A-Z]/.test(s))c+=26;if(/\d/.test(s))c+=10;if(/[^A-Za-z0-9]/.test(s))c+=32;const b=Math.round(s.length*Math.log2(c));return `Estimated entropy: ${b} bits\nRating: ${b<40?'Weak':b<60?'Fair':b<80?'Strong':'Very strong'}\nCommon words and patterns are weaker than this estimate.`});
+add('hash-generator','Hash generator','Security','SHA-1, SHA-256, SHA-384 and SHA-512 hashes of any text.',[F('t','Text','a','hello'),F('a','Algorithm','s','SHA-256',['SHA-256','SHA-1','SHA-384','SHA-512'])],async v=>{if(!(window.crypto&&crypto.subtle))throw Error('Hashing needs a secure (https) page');return [...new Uint8Array(await crypto.subtle.digest(v.a,new TextEncoder().encode(v.t)))].map(b=>b.toString(16).padStart(2,'0')).join('')});
+add('random-number','Random number generator','Security','Unbiased random integers in a range.',[F('a','Minimum','n','1'),F('b','Maximum','n','100'),F('n','How many','n','5')],v=>{const a=Math.ceil(N(v.a,'Minimum')),b=Math.floor(N(v.b,'Maximum')),n=N(v.n,'Count');if(a>b)throw Error('Minimum must not exceed maximum');if(n<1||n>1000)throw Error('Choose 1 to 1000 numbers');return Array.from({length:n},()=>a+rnd(b-a+1)).join(', ')});
+
+// Color
+add('hex-rgb','HEX and RGB converter','Color','Convert a HEX color to RGB or RGB to HEX.',[F('c','Color','t','#2b4eff')],v=>{const s=v.c.trim();let r,g,b,m;if(m=s.match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i)){let x=m[1];if(x.length==3)x=[...x].map(c=>c+c).join('');[r,g,b]=[0,2,4].map(i=>parseInt(x.slice(i,i+2),16))}else if(m=s.match(/^(?:rgb\()?\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*\)?$/i)){[r,g,b]=m.slice(1).map(Number);if([r,g,b].some(x=>x>255))throw Error('RGB values go from 0 to 255')}else throw Error('Enter a HEX like #2b4eff or RGB like 43, 78, 255');return `HEX: #${[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('')}\nRGB: rgb(${r}, ${g}, ${b})`});
+const lum=x=>{const [r,g,b]=[1,3,5].map(i=>parseInt(x.slice(i,i+2),16)/255).map(c=>c<=.03928?c/12.92:((c+.055)/1.055)**2.4);return .2126*r+.7152*g+.0722*b};
+add('contrast-checker','Contrast checker','Color','Check text and background colors against WCAG.',[F('a','Text color','k','#14202b'),F('b','Background color','k','#ffffff')],v=>{const a=lum(v.a),b=lum(v.b),r=(Math.max(a,b)+.05)/(Math.min(a,b)+.05),p=t=>r>=t?'Pass':'Fail';return `Contrast ratio: ${r.toFixed(2)}:1\nAA normal text (4.5): ${p(4.5)}\nAA large text (3): ${p(3)}\nAAA normal text (7): ${p(7)}`});
+
+// Data
+const csv=s=>{const r=[];let row=[],c='',q=0;for(let i=0;i<s.length;i++){const ch=s[i];if(q){if(ch=='"'){if(s[i+1]=='"'){c+='"';i++}else q=0}else c+=ch}else if(ch=='"')q=1;else if(ch==','){row.push(c);c=''}else if(ch=='\n'||ch=='\r'){if(ch=='\r'&&s[i+1]=='\n')i++;row.push(c);r.push(row);row=[];c=''}else c+=ch}if(c||row.length){row.push(c);r.push(row)}return r.filter(x=>x.some(y=>y!==''))};
+add('csv-to-json','CSV to JSON','Data','Turn CSV with a header row into a JSON array.',[F('t','CSV','a','name,age\nAda,36\n"Smith, Jo",41')],v=>{const r=csv(v.t);if(r.length<2)throw Error('Add a header row and at least one data row');return JSON.stringify(r.slice(1).map(x=>Object.fromEntries(r[0].map((k,i)=>[k,x[i]??'']))),null,2)});
+add('json-to-csv','JSON to CSV','Data','Turn a JSON array of objects into CSV.',[F('t','JSON','a','[{"name":"Ada","age":36},{"name":"Jo","age":41}]')],v=>{let a;try{a=JSON.parse(v.t)}catch(e){throw Error('Invalid JSON: '+e.message)}if(!Array.isArray(a)||!a.length||!a.every(o=>o&&typeof o=='object'))throw Error('Paste a JSON array of objects');const k=[...new Set(a.flatMap(Object.keys))],q=x=>{x=x==null?'':typeof x=='object'?JSON.stringify(x):String(x);return /[",\n]/.test(x)?'"'+x.replace(/"/g,'""')+'"':x};return [k.map(q).join(','),...a.map(o=>k.map(c=>q(o[c])).join(','))].join('\n')});
+
+// Miscellaneous
+add('binary-converter','Binary, octal, decimal and hex','Miscellaneous','Convert a whole number between number bases.',[F('n','Number','t','255'),F('b','Input base','s','10',['2','8','10','16'])],v=>{const re={2:/^[01]+$/,8:/^[0-7]+$/,10:/^\d+$/,16:/^[0-9a-f]+$/i},x=v.n.trim();if(!re[v.b].test(x))throw Error('That isn’t a valid base-'+v.b+' number');const n=BigInt({2:'0b',8:'0o',10:'',16:'0x'}[v.b]+x);return `Binary: ${n.toString(2)}\nOctal: ${n.toString(8)}\nDecimal: ${n}\nHex: ${n.toString(16).toUpperCase()}`});
+const ON='zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen'.split(' '),TN='  twenty thirty forty fifty sixty seventy eighty ninety'.split(' '),BG=['','thousand','million','billion','trillion'];
+const sub=n=>n<20?ON[n]:n<100?TN[n/10|0]+(n%10?'-'+ON[n%10]:''):ON[n/100|0]+' hundred'+(n%100?' '+sub(n%100):'');
+add('number-to-words','Number to words','Miscellaneous','Spell out whole numbers in English.',[F('n','Number','n','12345')],v=>{let n=N(v.n,'Number');if(!Number.isSafeInteger(n)||Math.abs(n)>=1e15)throw Error('Enter a whole number below one quadrillion');const neg=n<0;n=Math.abs(n);if(!n)return 'zero';const o=[];for(let i=0;n>0;i++,n=Math.floor(n/1000)){const p=n%1000;if(p)o.unshift(sub(p)+(BG[i]?' '+BG[i]:''))}return (neg?'minus ':'')+o.join(' ')});
+
+// Student
+add('attendance','Attendance calculator','Student','See your attendance and how many classes you can miss or must attend.',[F('a','Classes attended','n','42'),F('t','Total classes','n','60'),F('r','Required (%)','n','75')],v=>{const a=N(v.a,'Attended'),t=N(v.t,'Total'),r=N(v.r,'Required %');if(t<=0||a<0||a>t||r<0||r>=100)throw Error('Attended can’t exceed total, and required must be under 100');const p=a/t*100;if(p>=r){const k=Math.floor(a*100/r-t);return `Attendance: ${fmt(p,2)}%\nYou can miss ${k} more class${k==1?'':'es'} and stay at ${r}%`}return `Attendance: ${fmt(p,2)}%\nAttend the next ${Math.ceil((r*t-100*a)/(100-r))} classes in a row to reach ${r}%`});
+const G={'A+':4,A:4,'A-':3.7,'B+':3.3,B:3,'B-':2.7,'C+':2.3,C:2,'C-':1.7,D:1,F:0};
+add('gpa','GPA calculator','Student','Weighted GPA on a 4.0 scale. One course per line: grade, then credits.',[F('t','Courses','a','A 4\nB+ 3\nA- 3')],v=>{let p=0,cr=0;for(const l of v.t.split('\n').filter(x=>x.trim())){const [g,c]=l.trim().split(/\s+/),k=g.toUpperCase(),n=parseFloat(c);if(!(k in G)||!(n>0))throw Error('Check this line: “'+l+'”. Use a grade and credits, like A- 3');p+=G[k]*n;cr+=n}if(!cr)throw Error('Add one course per line, like A 3');return `GPA: ${(p/cr).toFixed(2)}\nCredits: ${cr}`});
+
+// Productivity
+function clock(el,down){let acc=0,st=0,id=0;const m=h('input',{type:'number',min:0,value:5,'aria-label':'Minutes'}),s=h('input',{type:'number',min:0,max:59,value:0,'aria-label':'Seconds'}),d=h('div',{class:'big',role:'timer'}),tot=()=>(Math.max(0,+m.value||0)*60+Math.max(0,+s.value||0))*1e3,cur=()=>acc+(id?performance.now()-st:0);
+const stop=()=>{if(id){acc+=performance.now()-st;clearInterval(id);id=0}},fmtT=v=>{const x=v/1e3;return `${Math.floor(x/60)}:${String(Math.floor(x%60)).padStart(2,'0')}.${Math.floor(v%1e3/100)}`};
+const go=h('button',{class:'btn p',onclick:()=>{if(id){stop();go.textContent='Start'}else{st=performance.now();id=setInterval(show,100);go.textContent='Pause'}show()}},'Start');
+function show(){const v=down?Math.max(0,tot()-cur()):cur();if(down&&id&&v<=0){stop();acc=0;go.textContent='Start';d.textContent='Time’s up';navigator.vibrate&&navigator.vibrate(300);return}d.textContent=fmtT(v)}
+const reset=()=>{stop();acc=0;go.textContent='Start';show()};m.oninput=s.oninput=()=>{if(!id){acc=0;show()}};
+el.append(...(down?[h('div',{class:'pair'},h('div',{},h('label',{for:'cm'},'Minutes'),m),h('div',{},h('label',{for:'cs'},'Seconds'),s))]:[]),d,h('div',{class:'row'},go,h('button',{class:'btn',onclick:reset},'Reset')));m.id='cm';s.id='cs';show();return stop}
+add('stopwatch','Stopwatch','Productivity','Time anything, with start, pause and reset.',[],null,{ui:el=>clock(el,0)});
+add('countdown','Countdown timer','Productivity','Count down from any number of minutes and seconds.',[],null,{ui:el=>clock(el,1)});
+
+// App
+const CATS=[...new Set(T.map(t=>t.cat))],dot=c=>h('span',{class:'dot','aria-hidden':'true',style:`background:hsl(${CATS.indexOf(c)*47+210} 60% 55%)`});
+let clean=()=>{},q='',cat='All';
+function toolPage(t){const rec=ls.g('ok-rec',[]).filter(x=>x!=t.id);rec.unshift(t.id);ls.s('ok-rec',rec.slice(0,6));
+const fav=()=>ls.g('ok-fav',[]).includes(t.id),star=h('button',{class:'star','aria-label':'Favorite this tool','aria-pressed':fav(),onclick:()=>{const f=ls.g('ok-fav',[]),i=f.indexOf(t.id);i<0?f.push(t.id):f.splice(i,1);ls.s('ok-fav',f);star.setAttribute('aria-pressed',fav())}},'★');
+const page=h('section',{},h('a',{class:'back',href:'#'},'‹ All tools'),h('div',{style:'display:flex;align-items:center;gap:8px'},h('h2',{style:'flex:1'},t.name),star),h('p',{class:'lead'},t.desc));
+if(t.ui){const b=h('div');page.append(b);clean=t.ui(b)||(()=>{});return page}
+const vals={},els={},out=h('pre',{class:'out','aria-live':'polite',tabindex:'0'});t.f.forEach(x=>vals[x.k]=x.d);let seq=0;
+const run=async()=>{const n=++seq;try{const r=await t.run({...vals});if(n==seq){out.textContent=r;out.classList.remove('err')}}catch(e){if(n==seq){out.textContent=e.message;out.classList.add('err')}}};
+t.f.forEach(x=>{const id='f-'+x.k,ty={n:'number',d:'date',k:'color',t:'text',p:'password',c:'checkbox'}[x.t];const el=x.t=='a'?h('textarea',{id,rows:6,spellcheck:'false'}):x.t=='s'?h('select',{id},x.o.map(o=>h('option',{value:o},o))):h('input',{id,type:ty,step:'any'});
+const set=()=>{x.t=='c'?el.checked=!!x.d:el.value=x.d};set();x.set=set;el.addEventListener('input',()=>{vals[x.k]=x.t=='c'?el.checked:el.value;run()});
+page.append(h('div',{class:'fld'+(x.t=='c'?' chk':'')},...(x.t=='c'?[el,h('label',{for:id},x.l)]:[h('label',{for:id},x.l),el])))});
+const cp=h('button',{class:'btn p',onclick:async()=>{try{await navigator.clipboard.writeText(out.textContent);cp.textContent='Copied'}catch{const r=document.createRange();r.selectNodeContents(out);getSelection().removeAllRanges();getSelection().addRange(r);cp.textContent='Selected, press copy'}setTimeout(()=>cp.textContent='Copy result',1800)}},'Copy result');
+page.append(out,h('div',{class:'row'},cp,h('button',{class:'btn',onclick:()=>{t.f.forEach(x=>{vals[x.k]=x.d;x.set()});run()}},'Reset')));run();return page}
+function home(){const fav=()=>ls.g('ok-fav',[]),list=h('ul',{class:'list'}),chips=h('div',{class:'chips',role:'group','aria-label':'Categories'});
+const draw=()=>{list.replaceChildren();const f=fav(),r=T.filter(t=>(cat=='All'||(cat=='Favorites'?f.includes(t.id):t.cat==cat))&&(t.name+' '+t.desc+' '+t.cat).toLowerCase().includes(q.toLowerCase()));
+if(!r.length)list.append(h('li',{class:'empty'},cat=='Favorites'&&!q?'No favorites yet. Star a tool to keep it here.':'No tool matches “'+q+'”. Try a shorter word or pick All.'));
+r.forEach(t=>list.append(h('li',{},h('a',{href:'#'+t.id},h('b',{},t.name),h('small',{},dot(t.cat),t.cat+': '+t.desc)),h('button',{class:'star','aria-label':'Favorite '+t.name,'aria-pressed':f.includes(t.id),onclick:()=>{const g=fav(),i=g.indexOf(t.id);i<0?g.push(t.id):g.splice(i,1);ls.s('ok-fav',g);draw()}},'★'))))};
+['All','Favorites',...CATS].forEach(c=>{const b=h('button',{class:'chip','aria-pressed':c==cat,onclick:()=>{cat=c;chips.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x==b));draw()}},c);chips.append(b)});
+const rec=ls.g('ok-rec',[]).map(id=>T.find(t=>t.id==id)).filter(Boolean);
+return h('section',{},h('h1',{},'Everyday tools that never leave your browser'),h('p',{class:'lead'},T.length+' free tools for text, code, money, dates, colors and study. No sign-up, no uploads, no tracking.'),
+h('input',{class:'search',type:'search',placeholder:'Search '+T.length+' tools',value:q,'aria-label':'Search tools',oninput:e=>{q=e.target.value;draw()}}),chips,
+rec.length?h('p',{class:'rec'},'Recently used: ',rec.map(t=>h('a',{href:'#'+t.id},t.name))):null,list,(draw(),null))}
+function route(){clean();clean=()=>{};const t=T.find(x=>x.id==location.hash.slice(1)),app=$('#app'),m=$('meta[name=description]');app.replaceChildren();
+if(t){document.title=t.name+' – OpenKit';m.content=t.desc+' Free, private and runs in your browser.';app.append(toolPage(t))}else{document.title='OpenKit – free everyday tools';m.content='Free everyday tools that run entirely in your browser. No sign-up, no uploads.';app.append(home())}scrollTo(0,0)}
+addEventListener('hashchange',route);
+const root=document.documentElement,sv=ls.g('ok-theme',null);if(sv)root.dataset.theme=sv;
+$('#th').onclick=()=>{const dark=root.dataset.theme?root.dataset.theme=='dark':matchMedia('(prefers-color-scheme: dark)').matches,n=dark?'light':'dark';root.dataset.theme=n;ls.s('ok-theme',n)};
+route();
+</script></body></html>
